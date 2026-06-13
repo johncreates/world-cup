@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient as supabaseCreateClient } from '@supabase/supabase-js'
 
-// One-time bootstrap: creates the admin account if none exists
-// Call POST /api/admin/bootstrap with { secret: ADMIN_BOOTSTRAP_SECRET }
 export async function POST(request: NextRequest) {
   const { secret, nickname } = await request.json()
 
@@ -11,9 +9,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid secret' }, { status: 403 })
   }
 
-  const supabase = await createClient()
+  const supabase = supabaseCreateClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false } }
+  )
 
-  // Check if admin already exists
   const { data: existing } = await supabase
     .from('participants')
     .select('id, nickname, auth_token')
@@ -23,6 +24,7 @@ export async function POST(request: NextRequest) {
   if (existing) {
     return NextResponse.json({
       message: 'Admin already exists',
+      participant_id: existing.id,
       nickname: existing.nickname,
       auth_token: existing.auth_token,
     })
@@ -41,8 +43,8 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({
     message: 'Admin created successfully',
+    participant_id: participant.id,
     auth_token: participant.auth_token,
     nickname: participant.nickname,
-    instructions: 'Store this auth_token — use it as x-participant-token for admin API calls and in the admin session.',
   })
 }
