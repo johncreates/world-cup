@@ -1,26 +1,48 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Semantic ink colors */
+  --color-ink: #2A241E;
+  --color-ink-muted: #766F68;
+  --color-ink-faint: #9C9690;
+
+  /* Amber accent for text (darker, contrast-safe on sand) */
+  --color-amber-text: #8B4A14;
+
+  /* Remap gray scale → warm sand palette
+     950 = page bg (lightest), 900 = card bg, 800 = interactive, etc. */
+  --color-gray-950: #EAE6DF;
+  --color-gray-900: #E2DDD4;
+  --color-gray-800: #D9D4CB;
+  --color-gray-700: #CEC9C0;
+  --color-gray-600: #C4BFB6;
+  --color-gray-500: #9C9690;
+  --color-gray-400: #766F68;
+  --color-gray-300: #5A5450;
+  --color-gray-200: #3A3430;
+  --color-gray-100: #2A2420;
+
+  /* Remap yellow → amber (#D4892A) */
+  --color-yellow-50:  #FEF4E5;
+  --color-yellow-100: #FDE4BB;
+  --color-yellow-200: #FBD08C;
+  --color-yellow-300: #C07820;
+  --color-yellow-400: #D4892A;
+  --color-yellow-500: #C07820;
+  --color-yellow-600: #A36218;
+  --color-yellow-700: #C07820;
+  --color-yellow-800: #8B4A14;
+  --color-yellow-900: #C07820;
+  --color-yellow-950: #D4892A;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-serif: var(--font-lora);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #EAE6DF;
+  color: #2A241E;
 }

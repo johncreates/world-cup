@@ -31,7 +31,7 @@ export default function ResultsPage() {
 
   if (loading || !session) return null
   if (loadingData) {
-    return <div className="py-16 text-center text-gray-500 animate-pulse">Loading…</div>
+    return <div className="py-16 text-center text-ink-faint animate-pulse">Loading…</div>
   }
 
   const now = new Date()
@@ -40,7 +40,6 @@ export default function ResultsPage() {
     if (filter === 'upcoming') return matches.filter((m) => !m.result_confirmed_at && new Date(m.kickoff_at) > now)
     if (filter === 'live') return matches.filter((m) => !m.result_confirmed_at && new Date(m.kickoff_at) <= now)
     if (filter === 'finished') return matches.filter((m) => !!m.result_confirmed_at)
-    // Group filter
     return matches.filter((m) => m.group_id === filter)
   }
 
@@ -58,8 +57,8 @@ export default function ResultsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Schedule & Results</h1>
+    <div className="space-y-6 pt-4">
+      <h1 className="font-serif text-3xl font-normal text-ink">Schedule & Results</h1>
 
       <div className="flex gap-1.5 flex-wrap">
         {filters.map((f) => (
@@ -67,7 +66,9 @@ export default function ResultsPage() {
             key={f.key}
             onClick={() => setFilter(f.key)}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              filter === f.key ? 'bg-yellow-400 text-black' : 'bg-gray-800 text-gray-400 hover:text-white'
+              filter === f.key
+                ? 'bg-yellow-400 text-black'
+                : 'bg-gray-800 text-ink-muted hover:text-ink hover:bg-gray-700'
             }`}
           >
             {f.label}
@@ -75,7 +76,7 @@ export default function ResultsPage() {
         ))}
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         {filtered.map((match) => {
           const kickoff = new Date(match.kickoff_at)
           const isFinished = !!match.result_confirmed_at
@@ -90,34 +91,36 @@ export default function ResultsPage() {
             <div
               key={match.id}
               className={`bg-gray-900 border rounded-xl px-4 py-3 flex items-center gap-3 ${
-                isFinished ? 'border-gray-700' : isLive ? 'border-orange-800' : 'border-gray-800'
+                isFinished ? 'border-gray-700' : isLive ? 'border-orange-300' : 'border-gray-700'
               }`}
             >
-              <div className="text-xs text-gray-600 w-10 shrink-0 font-mono">
-                M{match.match_number}
-              </div>
-              <div className="text-xs text-gray-500 w-8 shrink-0">
-                {match.group_id ? `Grp ${match.group_id}` : stageLabel[match.stage]}
+              <div className="text-xs text-ink-faint w-8 shrink-0 font-mono">M{match.match_number}</div>
+              <div className="text-xs text-ink-faint w-8 shrink-0">
+                {match.group_id ? `G${match.group_id}` : stageLabel[match.stage]}
               </div>
               <div className="flex-1 flex items-center gap-2 min-w-0">
-                <span className="text-sm font-medium truncate text-right flex-1">
+                <span className="text-sm font-medium truncate text-right flex-1 text-ink">
                   {homeFlag} {homeName}
                 </span>
-                <span className={`text-sm font-bold tabular-nums shrink-0 ${isFinished ? 'text-yellow-400' : 'text-gray-500'}`}>
+                <span className={`text-sm font-bold tabular-nums shrink-0 ${
+                  isFinished ? 'text-amber-text' : isLive ? 'text-orange-600' : 'text-ink-faint'
+                }`}>
                   {isFinished ? `${match.home_score} – ${match.away_score}` : isLive ? 'LIVE' : '–'}
                 </span>
-                <span className="text-sm font-medium truncate flex-1">
+                <span className="text-sm font-medium truncate flex-1 text-ink">
                   {awayFlag} {awayName}
                 </span>
               </div>
-              <div className="text-xs text-gray-600 shrink-0 hidden sm:block">
-                {kickoff.toLocaleDateString('en-AU', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+              <div className="text-xs text-ink-faint shrink-0 hidden sm:block">
+                {kickoff.toLocaleDateString('en-AU', {
+                  month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
+                })}
               </div>
             </div>
           )
         })}
         {filtered.length === 0 && (
-          <p className="text-gray-500 text-center py-8">No matches in this filter</p>
+          <p className="text-ink-faint text-center py-8">No matches in this filter</p>
         )}
       </div>
     </div>

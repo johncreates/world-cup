@@ -31,21 +31,17 @@ export default function KnockoutTipsPage() {
   useEffect(() => {
     if (!session) return
     async function load() {
-      const [matchesRes, tipsRes, teamsRes] = await Promise.all([
-        fetch('/api/matches?stage=r32').then((r) => r.json()),
-        fetch('/api/tips', { headers: { 'x-participant-token': session!.auth_token } }).then((r) => r.json()),
-        fetch('/api/matches').then(() => null), // teams fetched separately
-      ])
-
-      // Fetch all knockout matches
       const stagePromises = KNOCKOUT_STAGES.map((s) =>
         fetch(`/api/matches?stage=${s.key}`).then((r) => r.json())
       )
-      const allStages = await Promise.all(stagePromises)
-      const allMatches: Match[] = allStages.flat()
+      const [tipsRes, ...allStages] = await Promise.all([
+        fetch('/api/tips', { headers: { 'x-participant-token': session!.auth_token } }).then((r) => r.json()),
+        ...stagePromises,
+      ])
+
+      const allMatches: Match[] = (allStages as Match[][]).flat()
       setMatches(allMatches)
 
-      // Extract all teams from matches
       const teamMap: Record<string, Team> = {}
       for (const m of allMatches) {
         if (m.home_team) teamMap[m.home_team.id] = m.home_team
@@ -61,7 +57,7 @@ export default function KnockoutTipsPage() {
     load()
   }, [session])
 
-  // Fetch all teams separately for the full eligibility list
+  // Augment team list with group stage teams
   useEffect(() => {
     if (!session) return
     fetch('/api/matches?stage=group')
@@ -85,31 +81,28 @@ export default function KnockoutTipsPage() {
   }
 
   function getEligibleTeams(match: Match): Team[] {
-    // If teams are confirmed, use them
     if (match.home_team && match.away_team) return [match.home_team, match.away_team]
-    // Otherwise return all known teams (tip from any)
     return teams
   }
 
   if (loading || !session) return null
   if (loadingData) {
-    return <div className="py-16 text-center text-gray-500 animate-pulse">Loading bracket…</div>
+    return <div className="py-16 text-center text-ink-faint animate-pulse">Loading bracket…</div>
   }
 
   const stageMatches = matches.filter((m) => m.stage === selectedStage)
   const tippedCount = matches.filter((m) => tips[m.id]).length
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pt-4">
       <div>
-        <h1 className="text-2xl font-bold">Knockout Bracket</h1>
-        <p className="text-gray-400 text-sm mt-0.5">{tippedCount}/{matches.length} knockout matches tipped</p>
-        <p className="text-gray-500 text-xs mt-1">
-          Tip any team to win — even if they haven&apos;t been confirmed yet. Points awarded when results are in.
+        <h1 className="font-serif text-3xl font-normal text-ink">Knockout Bracket</h1>
+        <p className="text-ink-faint text-sm mt-0.5">{tippedCount}/{matches.length} knockout matches tipped</p>
+        <p className="text-ink-faint text-xs mt-1">
+          Tip any team — even before they're confirmed. Points awarded when results are in.
         </p>
       </div>
 
-      {/* Stage tabs */}
       <div className="flex gap-1.5 flex-wrap">
         {KNOCKOUT_STAGES.map((s) => {
           const stageMs = matches.filter((m) => m.stage === s.key)
@@ -121,7 +114,7 @@ export default function KnockoutTipsPage() {
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 selectedStage === s.key
                   ? 'bg-yellow-400 text-black'
-                  : 'bg-gray-800 text-gray-400 hover:text-white'
+                  : 'bg-gray-800 text-ink-muted hover:text-ink hover:bg-gray-700'
               }`}
             >
               {s.label}
@@ -147,7 +140,7 @@ export default function KnockoutTipsPage() {
       </div>
 
       {stageMatches.length === 0 && (
-        <p className="text-gray-500 text-center py-8">No matches in this stage yet</p>
+        <p className="text-ink-faint text-center py-8">No matches in this stage yet</p>
       )}
     </div>
   )

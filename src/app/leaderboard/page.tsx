@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
 import type { LeaderboardEntry } from '@/types'
 
@@ -17,7 +18,7 @@ export default function LeaderboardPage() {
 
   useEffect(() => {
     if (!session) return
-    fetch('/api/leaderboard', { headers: { 'x-participant-token': session.auth_token } })
+    fetch('/api/leaderboard')
       .then((r) => r.json())
       .then((data) => {
         setEntries(data)
@@ -27,28 +28,28 @@ export default function LeaderboardPage() {
 
   if (loading || !session) return null
   if (loadingData) {
-    return <div className="py-16 text-center text-gray-500 animate-pulse">Loading leaderboard…</div>
+    return <div className="py-16 text-center text-ink-faint animate-pulse">Loading leaderboard…</div>
   }
 
   const medals = ['🥇', '🥈', '🥉']
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Leaderboard</h1>
+    <div className="space-y-6 pt-4">
+      <h1 className="font-serif text-3xl font-normal text-ink">Leaderboard</h1>
 
       {entries.length === 0 ? (
-        <p className="text-gray-500 text-center py-12">
+        <p className="text-ink-faint text-center py-12">
           No scores yet — tip some matches to get on the board!
         </p>
       ) : (
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+        <div className="rounded-2xl overflow-hidden border border-gray-700">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gray-800 text-xs text-gray-500">
-                <th className="text-left px-4 py-3 w-10">#</th>
-                <th className="text-left px-4 py-3">Player</th>
-                <th className="text-right px-4 py-3 w-20">Pts</th>
-                <th className="text-right px-4 py-3 w-20 hidden sm:table-cell">Tips</th>
+              <tr className="border-b border-dashed border-gray-700 text-xs text-ink-faint bg-gray-900">
+                <th className="text-left px-4 py-3 w-10 font-normal">#</th>
+                <th className="text-left px-4 py-3 font-normal">Player</th>
+                <th className="text-right px-4 py-3 w-16 font-normal">Pts</th>
+                <th className="text-right px-4 py-3 w-14 hidden sm:table-cell font-normal">Tips</th>
               </tr>
             </thead>
             <tbody>
@@ -57,23 +58,26 @@ export default function LeaderboardPage() {
                 return (
                   <tr
                     key={e.participant_id}
-                    className={`border-b border-gray-800 last:border-0 ${
-                      isMe ? 'bg-yellow-950/20' : 'hover:bg-gray-800/30'
-                    } transition-colors`}
+                    className={`border-b border-dashed border-gray-700 last:border-0 transition-colors ${
+                      isMe ? 'bg-yellow-950/20' : 'bg-gray-900 hover:bg-gray-800'
+                    }`}
                   >
-                    <td className="px-4 py-3 text-gray-500 text-sm">
-                      {i < 3 ? medals[i] : `${i + 1}`}
+                    <td className="px-4 py-3 text-ink-faint text-sm">
+                      {i < 3 ? medals[i] : i + 1}
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`font-medium ${isMe ? 'text-yellow-400' : 'text-white'}`}>
+                      <Link
+                        href={`/profile/${e.participant_id}`}
+                        className={`font-medium hover:underline ${isMe ? 'text-amber-text' : 'text-ink'}`}
+                      >
                         {e.nickname}
-                        {isMe && <span className="ml-1.5 text-xs text-yellow-600">(you)</span>}
-                      </span>
+                        {isMe && <span className="ml-1.5 text-xs text-ink-faint">(you)</span>}
+                      </Link>
                     </td>
-                    <td className="px-4 py-3 text-right font-bold text-yellow-400 tabular-nums">
+                    <td className="px-4 py-3 text-right font-bold text-amber-text tabular-nums">
                       {e.total_points}
                     </td>
-                    <td className="px-4 py-3 text-right text-gray-500 text-sm tabular-nums hidden sm:table-cell">
+                    <td className="px-4 py-3 text-right text-ink-faint text-sm tabular-nums hidden sm:table-cell">
                       {e.total_tips}
                     </td>
                   </tr>
@@ -84,9 +88,9 @@ export default function LeaderboardPage() {
         </div>
       )}
 
-      <div className="text-xs text-gray-600 text-center">
-        Scoring: Group 1pt (+2 exact) · R32 2pt · R16 3pt · QF 4pt · SF 6pt · Final 8pt
-      </div>
+      <p className="text-xs text-ink-faint text-center">
+        Scoring: Group 1pt · R32 2pt · R16 3pt · QF 4pt · SF 6pt · Final 8pt · Winner 15pt
+      </p>
     </div>
   )
 }

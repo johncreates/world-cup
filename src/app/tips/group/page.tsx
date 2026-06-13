@@ -40,10 +40,7 @@ export default function GroupTipsPage() {
   useEffect(() => {
     if (!session) return
     async function load() {
-      const [matchesRes] = await Promise.all([
-        fetch('/api/matches?stage=group'),
-        loadTips(),
-      ])
+      const [matchesRes] = await Promise.all([fetch('/api/matches?stage=group'), loadTips()])
       setMatches(await matchesRes.json())
       setLoadingData(false)
     }
@@ -70,39 +67,34 @@ export default function GroupTipsPage() {
 
   if (loading || !session) return null
   if (loadingData) {
-    return (
-      <div className="py-16 text-center text-gray-500 animate-pulse">Loading matches…</div>
-    )
+    return <div className="py-16 text-center text-ink-faint animate-pulse">Loading matches…</div>
   }
 
   const filteredMatches =
     selectedGroup === 'ALL' ? matches : matches.filter((m) => m.group_id === selectedGroup)
-
   const tippedCount = matches.filter((m) => tips[m.id]).length
-  const totalCount = matches.length
 
   return (
-    <div className="space-y-6">
-      {/* Tournament winner pick */}
+    <div className="space-y-6 pt-4">
       <TournamentWinnerCard session={session} />
 
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Group Stage</h1>
-          <p className="text-gray-400 text-sm mt-0.5">
-            {tippedCount}/{totalCount} matches tipped
+          <h1 className="font-serif text-3xl font-normal text-ink">Group Stage</h1>
+          <p className="text-ink-faint text-sm mt-0.5">
+            {tippedCount}/{matches.length} matches tipped
           </p>
         </div>
         <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => setShowCopyModal(true)}
-            className="px-3 py-2 bg-gray-800 text-gray-300 text-sm rounded-lg hover:bg-gray-700 transition-colors"
+            className="px-3 py-2 bg-gray-800 text-ink-muted text-sm rounded-lg hover:bg-gray-700 hover:text-ink transition-colors"
           >
             👯 Copy a friend
           </button>
           <button
             onClick={() => setShowChampionModal(true)}
-            className="px-3 py-2 bg-gray-800 text-gray-300 text-sm rounded-lg hover:bg-gray-700 transition-colors"
+            className="px-3 py-2 bg-gray-800 text-ink-muted text-sm rounded-lg hover:bg-gray-700 hover:text-ink transition-colors"
           >
             🏆 Pick my champion
           </button>
@@ -110,7 +102,7 @@ export default function GroupTipsPage() {
       </div>
 
       {copyNotice && (
-        <div className="bg-green-900/40 border border-green-700 rounded-lg px-4 py-2 text-green-400 text-sm">
+        <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-2 text-green-700 text-sm">
           {copyNotice}
         </div>
       )}
@@ -124,7 +116,7 @@ export default function GroupTipsPage() {
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               selectedGroup === g
                 ? 'bg-yellow-400 text-black'
-                : 'bg-gray-800 text-gray-400 hover:text-white'
+                : 'bg-gray-800 text-ink-muted hover:text-ink hover:bg-gray-700'
             }`}
           >
             {g === 'ALL' ? 'All Groups' : `Group ${g}`}
@@ -132,7 +124,6 @@ export default function GroupTipsPage() {
         ))}
       </div>
 
-      {/* Match cards */}
       <div className="grid gap-3 sm:grid-cols-2">
         {filteredMatches.map((match) => (
           <MatchCard
@@ -146,7 +137,7 @@ export default function GroupTipsPage() {
       </div>
 
       {filteredMatches.length === 0 && (
-        <p className="text-gray-500 text-center py-8">No matches found</p>
+        <p className="text-ink-faint text-center py-8">No matches found</p>
       )}
 
       {showCopyModal && (
@@ -156,7 +147,6 @@ export default function GroupTipsPage() {
           onClose={() => setShowCopyModal(false)}
         />
       )}
-
       {showChampionModal && (
         <ChampionPickerModal
           session={session}
