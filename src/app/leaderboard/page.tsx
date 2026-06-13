@@ -21,7 +21,7 @@ export default function LeaderboardPage() {
     fetch('/api/leaderboard')
       .then((r) => r.json())
       .then((data) => {
-        setEntries(data)
+        setEntries(Array.isArray(data) ? data : [])
         setLoadingData(false)
       })
   }, [session])
