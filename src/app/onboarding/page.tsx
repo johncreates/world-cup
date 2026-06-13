@@ -127,6 +127,21 @@ export default function OnboardingPage() {
     )
   }
 
+  async function handleReset() {
+    if (!session) return
+    await fetch('/api/picks/reset', {
+      method: 'POST',
+      headers: { 'x-participant-token': session.auth_token },
+    })
+    setAlreadyDone(false)
+    setPick1Id('')
+    setPick2Id('')
+    setPick3Id('')
+    setGroupPicks({})
+    setStep(STEPS.mode)
+    setMode(null)
+  }
+
   if (alreadyDone) {
     return (
       <div className="py-12 max-w-sm mx-auto text-center space-y-4">
@@ -139,6 +154,14 @@ export default function OnboardingPage() {
         >
           View My Tips →
         </button>
+        <div className="pt-4">
+          <button
+            onClick={handleReset}
+            className="text-xs text-ink-faint hover:text-red-500 transition-colors"
+          >
+            Reset picks and start over
+          </button>
+        </div>
       </div>
     )
   }
