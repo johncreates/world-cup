@@ -20,7 +20,6 @@ export async function GET(request: NextRequest) {
   if (matchId) query = query.eq('match_id', matchId)
 
   const { data, error } = await query
-
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json(data)
 }
@@ -31,15 +30,12 @@ export async function POST(request: NextRequest) {
   const { participant } = auth
 
   const body = await request.json()
-  const { match_id, predicted_home_score, predicted_away_score, predicted_winner_id } = body
+  const { match_id, predicted_outcome, predicted_winner_id } = body
 
-  if (!match_id) {
-    return NextResponse.json({ error: 'match_id required' }, { status: 400 })
-  }
+  if (!match_id) return NextResponse.json({ error: 'match_id required' }, { status: 400 })
 
   const supabase = await createClient()
 
-  // Check match lock
   const { data: match } = await supabase
     .from('matches')
     .select('id, kickoff_at, stage')
@@ -52,23 +48,21 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Tips are locked — this match has already kicked off' }, { status: 409 })
   }
 
-  // Validate tip completeness
   if (match.stage === 'group') {
-    if (predicted_home_score === undefined || predicted_away_score === undefined) {
-      return NextResponse.json({ error: 'Score prediction required for group stage matches' }, { status: 400 })
+    if (!predicted_outcome || !['home', 'draw', 'away'].includes(predicted_outcome)) {
+      return NextResponse.json({ error: 'predicted_outcome (home/draw/away) required for group stage' }, { status: 400 })
     }
   } else {
     if (!predicted_winner_id) {
-      return NextResponse.json({ error: 'Winner prediction required for knockout matches' }, { status: 400 })
+      return NextResponse.json({ error: 'predicted_winner_id required for knockout matches' }, { status: 400 })
     }
   }
 
   const tipData = {
     participant_id: participant.id,
     match_id,
-    predicted_home_score: predicted_home_score ?? null,
-    predicted_away_score: predicted_away_score ?? null,
-    predicted_winner_id: predicted_winner_id ?? null,
+    predicted_outcome: match.stage === 'group' ? predicted_outcome : null,
+    predicted_winner_id: match.stage !== 'group' ? predicted_winner_id : null,
     updated_at: new Date().toISOString(),
   }
 

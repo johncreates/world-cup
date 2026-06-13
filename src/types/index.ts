@@ -35,6 +35,7 @@ export interface Participant {
   id: string
   nickname: string
   is_admin: boolean
+  tournament_winner_id: string | null
   created_at: string
 }
 
@@ -53,8 +54,7 @@ export interface Tip {
   id: string
   participant_id: string
   match_id: string
-  predicted_home_score: number | null
-  predicted_away_score: number | null
+  predicted_outcome: Outcome | null
   predicted_winner_id: string | null
   created_at: string
   updated_at: string
@@ -62,6 +62,18 @@ export interface Tip {
   participant?: Participant
   match?: Match
   predicted_winner?: Team | null
+}
+
+export interface TipsterProfile {
+  participant_id: string
+  nickname: string
+  title: string
+  tournament_winner: Team | null
+  leaderboard_rank: number
+  total_tips: number
+  total_matches: number
+  max_possible_points: number
+  boldness_score: number
 }
 
 export interface LeaderboardEntry {
