@@ -30,6 +30,14 @@ export default function Nav() {
           {session && (
             <>
               <Link
+                href="/onboarding"
+                className={`px-2.5 py-1.5 text-sm transition-colors rounded-lg ${
+                  isActive('/onboarding') ? 'font-semibold text-ink' : 'text-ink-muted hover:text-ink'
+                }`}
+              >
+                My Picks
+              </Link>
+              <Link
                 href="/tips/group"
                 className={`px-2.5 py-1.5 text-sm transition-colors rounded-lg ${
                   isActive('/tips/group') ? 'font-semibold text-ink' : 'text-ink-muted hover:text-ink'

@@ -16,7 +16,7 @@ function JoinForm() {
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
-    if (!loading && session) router.replace('/tips/group')
+    if (!loading && session) router.replace('/onboarding')
   }, [session, loading, router])
 
   async function handleSubmit(e: React.FormEvent) {
@@ -37,7 +37,7 @@ function JoinForm() {
         nickname: data.nickname,
         is_admin: data.is_admin,
       })
-      router.push('/tips/group')
+      router.push('/onboarding')
     } catch {
       setError('Network error — please try again')
     } finally {

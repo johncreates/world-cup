@@ -36,7 +36,16 @@ export interface Participant {
   nickname: string
   is_admin: boolean
   tournament_winner_id: string | null
+  pick_1st_id: string | null
+  pick_2nd_id: string | null
+  pick_3rd_id: string | null
+  picks_completed: boolean
   created_at: string
+}
+
+export interface GroupWinnerPick {
+  group_id: string
+  team_id: string
 }
 
 export interface InviteCode {
@@ -80,13 +89,6 @@ export interface LeaderboardEntry {
   participant_id: string
   nickname: string
   total_points: number
-  group_points: number
-  r32_points: number
-  r16_points: number
-  qf_points: number
-  sf_points: number
-  final_points: number
-  correct_tips: number
   total_tips: number
 }
 
